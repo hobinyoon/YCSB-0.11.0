@@ -2,7 +2,7 @@
 
 -- https://github.com/brianfrankcooper/YCSB/tree/master/cassandra
 
-drop keyspace ycsb;
+drop keyspace if exists ycsb;
 
 create keyspace ycsb
 WITH REPLICATION = {'class' : 'SimpleStrategy', 'replication_factor': 1 };
