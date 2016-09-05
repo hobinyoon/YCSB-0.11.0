@@ -1,12 +1,28 @@
 TODO: ycsb run
 
+TODO: Does ycsb workloade d generates data on the fly?
+
 TODO: Why do all the workloads take the same 11 secs?
 Scan takes longer.
 
-TODO: What's the network latency like between the 2 nodes?
-- @ Latency. Use ping.
-- @ Throughput. iperf.
+TODO: Plot read and write latencies for different throughputs
 
+TODO: wanna be able to trace what requests the server serves
+- This might be a close thing
+  - https://www.ibm.com/support/knowledgecenter/SS3JSW_5.2.0/com.ibm.help.gdha_reference.doc/com.ibm.help.gdha_troubleshooting.doc/gdha_enabling_tracing.html
+- Another idea is to look for the source code and figure out where to insert
+	the statement. I think this is what I did during the development.
+
+-------------------------------------------------------------------------------
+
+nodetool drain seems to dump MemTable to a SSTable. You can measure the size
+easily that way.  It doesn't seem to accecpt any new connections after that.
+
+What's the network connection like between the client and the server nodes?
+- Latency. ping.
+	10 packets transmitted, 10 received, 0% packet loss, time 9000ms
+	rtt min/avg/max/mdev = 0.412/0.458/0.496/0.028 ms
+- Throughput. iperf. 1 Gbits/sec. Very stable.
 - Network hops?
 	traceroute from the client to the server.
 		client: 54.221.47.168  10.153.161.184
@@ -33,17 +49,6 @@ TODO: What's the network latency like between the 2 nodes?
 		15  100.92.240.67 (100.92.240.67)  17.670 ms 100.92.240.87 (100.92.240.87)  17.122 ms 100.92.240.139 (100.92.240.139)  15.880 ms
 		16  216.182.224.114 (216.182.224.114)  19.554 ms 216.182.224.96 (216.182.224.96)  17.339 ms 216.182.224.114 (216.182.224.114)  19.513 ms
 		17  ec2-54-145-43-45.compute-1.amazonaws.com (54.145.43.45)  0.430 ms  0.430 ms  0.424 ms
-
-
-TODO: Plot read and write latencies for different throughputs
-
-TODO: wanna be able to trace what requests the server serves
-- This might be a close thing
-  - https://www.ibm.com/support/knowledgecenter/SS3JSW_5.2.0/com.ibm.help.gdha_reference.doc/com.ibm.help.gdha_troubleshooting.doc/gdha_enabling_tracing.html
-- Another idea is to look for the source code and figure out where to insert
-	the statement. I think this is what I did during the development.
-
--------------------------------------------------------------------------------
 
 What is a good level of concurrency? how many threads? As long as you use the
 same number for the unmodified Cassandra and Mutants, you should be fine.
