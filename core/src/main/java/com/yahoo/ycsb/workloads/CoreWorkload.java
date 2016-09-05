@@ -35,6 +35,9 @@ import com.yahoo.ycsb.generator.UniformIntegerGenerator;
 import com.yahoo.ycsb.generator.ZipfianGenerator;
 import com.yahoo.ycsb.measurements.Measurements;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -81,6 +84,8 @@ import java.util.Vector;
  * </ul>
  */
 public class CoreWorkload extends Workload {
+  private static final Logger LOGGER = LogManager.getLogger();
+
   /**
    * The name of the database table to run queries against.
    */
@@ -674,6 +679,7 @@ public class CoreWorkload extends Workload {
   int nextKeynum() {
     int keynum;
     if (keychooser instanceof ExponentialGenerator) {
+      LOGGER.trace("");
       do {
         keynum = transactioninsertkeysequence.lastValue() - keychooser.nextValue().intValue();
       } while (keynum < 0);
@@ -682,10 +688,13 @@ public class CoreWorkload extends Workload {
         keynum = keychooser.nextValue().intValue();
       } while (keynum > transactioninsertkeysequence.lastValue());
     }
+    LOGGER.trace("keynum={}", keynum);
     return keynum;
   }
 
   public void doTransactionRead(DB db) {
+    LOGGER.trace("");
+
     // choose a random key
     int keynum = nextKeynum();
 
@@ -801,6 +810,8 @@ public class CoreWorkload extends Workload {
   }
 
   public void doTransactionInsert(DB db) {
+    LOGGER.trace("");
+
     // choose the next key
     int keynum = transactioninsertkeysequence.nextValue();
 
