@@ -139,6 +139,7 @@ LICENSE file.
 
   <build>
     <pluginManagement>
+			<!--
       <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -146,6 +147,7 @@ LICENSE file.
           <version>2.15</version>
         </plugin>
       </plugins>
+			-->
     </pluginManagement>
     <plugins>
       <plugin>
@@ -157,6 +159,7 @@ LICENSE file.
           <target>1.7</target>
         </configuration>
       </plugin>
+			<!--
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
@@ -173,6 +176,7 @@ LICENSE file.
           </execution>
         </executions>
       </plugin>
+			-->
     </plugins>
   </build>
 </project>
