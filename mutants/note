@@ -21,7 +21,14 @@ What happens if you run a workload without loading?
 		recordcount   =  1000
 		operationcount=100000
 
-TODO: I wonder what it reads exactly. Time to look into the code.
+TODO: I wonder what and when ycsb writes and reads exactly. Time to look into
+the code.
+
+
+
+
+
+
 
 TODO: Make sure "read latest" simulates Facebook's workload pattern.
 - Look into the code.
@@ -31,8 +38,17 @@ TODO: Make sure "read latest" simulates Facebook's workload pattern.
 
 
 
-Entry point:
-	core/src/main/java/com/yahoo/ycsb/Client.java main()
+
+Do you need transactions? I'm not sure. It is on by default. I had an
+impression that the overhead is too much and clients of NoSQL databases don't
+use it.
+- Cassandra doesn't need them. "In Cassandra, a write is atomic at the
+  partition-level".
+  - https://docs.datastax.com/en/cassandra/2.1/cassandra/dml/dml_atomicity_c.html
+- TODO: What about other DBs?
+
+TODO: Scale to 3 nodes? Probably yes. When the deployment is done.
+
 
 
 
@@ -61,6 +77,9 @@ TODO: How to trace the cql statements that the Cassandra server serves?
 	the statement. I think this is what I did during the development.
 
 -------------------------------------------------------------------------------
+
+Entry point:
+	core/src/main/java/com/yahoo/ycsb/Client.java main()
 
 YCSB Build:
 - mvn -pl com.yahoo.ycsb:cassandra-binding -am clean package -DskipTests
