@@ -31,7 +31,8 @@ TODO: Make sure "read latest" simulates Facebook's workload pattern.
 
 
 
-
+Entry point:
+	core/src/main/java/com/yahoo/ycsb/Client.java main()
 
 
 

@@ -40,6 +40,9 @@ import org.apache.htrace.core.Tracer;
 import org.apache.htrace.core.TraceScope;
 import org.apache.htrace.core.HTraceConfiguration;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import com.yahoo.ycsb.measurements.Measurements;
 import com.yahoo.ycsb.measurements.exporter.MeasurementsExporter;
 import com.yahoo.ycsb.measurements.exporter.TextMeasurementsExporter;
@@ -359,6 +362,8 @@ class RemainingFormatter {
  */
 class ClientThread implements Runnable
 {
+  private static final Logger LOGGER = LogManager.getLogger();
+
   /** Counts down each of the clients completing. */
   private final CountDownLatch _completeLatch;
 
@@ -415,6 +420,7 @@ class ClientThread implements Runnable
   {
     try
     {
+      LOGGER.trace("Here!!!");
       _db.init();
     }
     catch (DBException e)
