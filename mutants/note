@@ -1,19 +1,71 @@
-TODO: ycsb run
+What happens if you run a workload without loading?
+- "workload a" gets "read-failed". It's okay.
+- "workload d" gets "read-failed" too. TODO: I wonder if I should modify this,
+	or it's only for the initial few records.
+	- When you increase the number of requests, you get less read failed ratios.
+		 10,000 reqs: 2426 "read-failed"s
+		100,000 reqs: 7031 "read-failed"s
+	- As time goes by, you get less of them, which suggests they read some of the
+		latest records.
+		10 sec:  11240 operations; 1124   current ops/sec; READ-FAILED: Count=2616
+		20 sec:  23106 operations; 1186.6 current ops/sec; READ-FAILED: Count=1209
+		30 sec:  34990 operations; 1188.4 current ops/sec; READ-FAILED: Count= 819
+		40 sec:  46873 operations; 1188.3 current ops/sec; READ-FAILED: Count= 661
+		50 sec:  58744 operations; 1187.1 current ops/sec; READ-FAILED: Count= 492
+		60 sec:  71300 operations; 1255.6 current ops/sec; READ-FAILED: Count= 462
+		70 sec:  83244 operations; 1194.4 current ops/sec; READ-FAILED: Count= 366
+		80 sec:  95109 operations; 1186.5 current ops/sec; READ-FAILED: Count= 301
+		86 sec: 100000 operations;  810.3 current ops/sec; READ-FAILED: Count= 105
+	- If you load the table with "recordcount = 1000", you don't get any READ-FAILED.
+	- TODO: which parameter controls the behavior? This one? Look into the code.
+		recordcount   =  1000
+		operationcount=100000
 
-TODO: Does ycsb workloade d generates data on the fly?
+TODO: I wonder what it reads exactly. Time to look into the code.
 
-TODO: Why do all the workloads take the same 11 secs?
-Scan takes longer.
+TODO: Make sure "read latest" simulates Facebook's workload pattern.
+- Look into the code.
+- The configuration file doesn't have any zipian parameters for read popularity
+	of objects.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+TODO: What does the measurement do? Something useful that I can use?
+- core/src/main/java/com/yahoo/ycsb/measurements/*
 
 TODO: Plot read and write latencies for different throughputs
 
-TODO: wanna be able to trace what requests the server serves
+TODO: How to trace the cql statements that the Cassandra server serves?
 - This might be a close thing
   - https://www.ibm.com/support/knowledgecenter/SS3JSW_5.2.0/com.ibm.help.gdha_reference.doc/com.ibm.help.gdha_troubleshooting.doc/gdha_enabling_tracing.html
 - Another idea is to look for the source code and figure out where to insert
 	the statement. I think this is what I did during the development.
 
 -------------------------------------------------------------------------------
+
+YCSB Build:
+- mvn -pl com.yahoo.ycsb:cassandra-binding -am clean package -DskipTests
+- Disabled the annoying checkstyle errors.
+
+ycsb workloade d generates data on the fly.
 
 nodetool drain seems to dump MemTable to a SSTable. You can measure the size
 easily that way.  It doesn't seem to accecpt any new connections after that.
