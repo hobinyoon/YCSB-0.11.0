@@ -1,48 +1,34 @@
-What happens if you run a workload without loading?
-- "workload a" gets "read-failed". It's okay.
-- "workload d" gets "read-failed" too. TODO: I wonder if I should modify this,
-	or it's only for the initial few records.
-	- When you increase the number of requests, you get less read failed ratios.
-		 10,000 reqs: 2426 "read-failed"s
-		100,000 reqs: 7031 "read-failed"s
-	- As time goes by, you get less of them, which suggests they read some of the
-		latest records.
-		10 sec:  11240 operations; 1124   current ops/sec; READ-FAILED: Count=2616
-		20 sec:  23106 operations; 1186.6 current ops/sec; READ-FAILED: Count=1209
-		30 sec:  34990 operations; 1188.4 current ops/sec; READ-FAILED: Count= 819
-		40 sec:  46873 operations; 1188.3 current ops/sec; READ-FAILED: Count= 661
-		50 sec:  58744 operations; 1187.1 current ops/sec; READ-FAILED: Count= 492
-		60 sec:  71300 operations; 1255.6 current ops/sec; READ-FAILED: Count= 462
-		70 sec:  83244 operations; 1194.4 current ops/sec; READ-FAILED: Count= 366
-		80 sec:  95109 operations; 1186.5 current ops/sec; READ-FAILED: Count= 301
-		86 sec: 100000 operations;  810.3 current ops/sec; READ-FAILED: Count= 105
-	- If you load the table with "recordcount = 1000", you don't get any READ-FAILED.
-	- TODO: which parameter controls the behavior? This one? Look into the code.
-		recordcount   =  1000
-		operationcount=100000
 
-TODO: I wonder what and when ycsb writes and reads exactly. Time to look into
+
+
+TODO: Plot read and write latencies for different throughputs
+
+TODO: How to trace the cql statements that the Cassandra server serves?
+- This might be a close thing
+  - https://www.ibm.com/support/knowledgecenter/SS3JSW_5.2.0/com.ibm.help.gdha_reference.doc/com.ibm.help.gdha_troubleshooting.doc/gdha_enabling_tracing.html
+- Another idea is to look for the source code and figure out where to insert
+	the statement. I think this is what I did during the development.
+
+
+
+
+
+
+I wonder what and when ycsb writes and reads exactly. Time to look into
 the code.
+- Write key is incremented sequentially from recordcount. When converted to a
+  string value, it is either hashed (when orderedinserts = false, the default
+  value) or not. For Mutants, it doesn't mater.  What matters is the access
+  popularity drop as an object ages.
+- Read key generation is Zipian based on the last inserted key. With the Zipian
+  constant 0.99, which I think controls how much it favors the recently
+  inserted values. Don't need to understand the exact formula.  I think it
+  gives a more accurate curve at the right end than my Facebook workload
+  generator.
+  - TODO: Would be a small interesting point in the evaluation.
+  - TODO: Explore the Zipian constant
 
-
-
-
-
-
-
-TODO: Make sure "read latest" simulates Facebook's workload pattern.
-- Look into the code.
-- The configuration file doesn't have any zipian parameters for read popularity
-	of objects.
-
-
-
-
-
-Do you need transactions? I'm not sure.
-- YCSB has "Whether or not this is the transaction phase (run) or not (load).".
-  It is set by default when "run". TODO: Not sure if it means the DB
-  transaction.
+Do you need transactions? Probably not.
 - For Facebook-like applications, you won't need transactions most of the time.
   - For checking out someone's latest status updates. Well, permission checks
     will need it.
@@ -53,34 +39,20 @@ Do you need transactions? I'm not sure.
 
 TODO: Scale to 3 nodes? Probably yes. When the deployment is done.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 TODO: What does the measurement do? Something useful that I can use?
 - core/src/main/java/com/yahoo/ycsb/measurements/*
 
-TODO: Plot read and write latencies for different throughputs
-
-TODO: How to trace the cql statements that the Cassandra server serves?
-- This might be a close thing
-  - https://www.ibm.com/support/knowledgecenter/SS3JSW_5.2.0/com.ibm.help.gdha_reference.doc/com.ibm.help.gdha_troubleshooting.doc/gdha_enabling_tracing.html
-- Another idea is to look for the source code and figure out where to insert
-	the statement. I think this is what I did during the development.
-
 -------------------------------------------------------------------------------
+
+What happens if you run a workload without loading?
+- "workload a" gets "read-failed". It's okay.
+- "workload d" gets "read-failed" too. A "run" expects some records exist
+  initially. As more records are inserted, "read latest" picks recently
+  inserted values more.
+
+YCSB's _dotransactions is not a DB transaction; a group of atomic operations.
+It is "Whether or not this is the transaction phase (run) or not (load).".  It
+is set by default when in a "run" mode.
 
 Entry point:
 	core/src/main/java/com/yahoo/ycsb/Client.java main()

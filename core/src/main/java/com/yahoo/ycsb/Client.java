@@ -420,7 +420,6 @@ class ClientThread implements Runnable
   {
     try
     {
-      LOGGER.trace("");
       _db.init();
     }
     catch (DBException e)
@@ -432,7 +431,6 @@ class ClientThread implements Runnable
 
     try
     {
-      LOGGER.trace("");
       _workloadstate=_workload.initThread(_props,_threadid,_threadcount);
     }
     catch (WorkloadException e)
@@ -461,8 +459,6 @@ class ClientThread implements Runnable
 
         while (((_opcount == 0) || (_opsdone < _opcount)) && !_workload.isStopRequested())
         {
-          LOGGER.trace("");
-
           if (!_workload.doTransaction(_db,_workloadstate))
           {
             break;
@@ -479,8 +475,6 @@ class ClientThread implements Runnable
 
         while (((_opcount == 0) || (_opsdone < _opcount)) && !_workload.isStopRequested())
         {
-          LOGGER.trace("");
-
           if (!_workload.doInsert(_db,_workloadstate))
           {
             break;

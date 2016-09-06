@@ -455,6 +455,7 @@ public class CoreWorkload extends Workload {
     } else {
       orderedinserts = true;
     }
+    //LOGGER.trace("orderedinserts={}", orderedinserts);
 
     keysequence = new CounterGenerator(insertstart);
     operationchooser = createOperationGenerator(p);
@@ -679,24 +680,26 @@ public class CoreWorkload extends Workload {
   int nextKeynum() {
     int keynum;
     if (keychooser instanceof ExponentialGenerator) {
-      LOGGER.trace("");
       do {
         keynum = transactioninsertkeysequence.lastValue() - keychooser.nextValue().intValue();
       } while (keynum < 0);
     } else {
+      // With workload d, keychooser is of type
+      // com.yahoo.ycsb.generator.SkewedLatestGenerator. It knows the last
+      // generated insert key from transactioninsertkeysequence, which is set
+      // when constructed.
       do {
         keynum = keychooser.nextValue().intValue();
       } while (keynum > transactioninsertkeysequence.lastValue());
+      //LOGGER.trace("keynum={}", keynum);
     }
-    LOGGER.trace("keynum={}", keynum);
     return keynum;
   }
 
   public void doTransactionRead(DB db) {
-    LOGGER.trace("");
-
     // choose a random key
     int keynum = nextKeynum();
+    //LOGGER.trace("Read keynum={}", keynum);
 
     String keyname = buildKeyName(keynum);
 
@@ -810,10 +813,9 @@ public class CoreWorkload extends Workload {
   }
 
   public void doTransactionInsert(DB db) {
-    LOGGER.trace("");
-
     // choose the next key
     int keynum = transactioninsertkeysequence.nextValue();
+    //LOGGER.trace("Insert keynum={}", keynum);
 
     try {
       String dbkey = buildKeyName(keynum);
