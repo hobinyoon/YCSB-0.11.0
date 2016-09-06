@@ -1,31 +1,59 @@
 High priority
 -------------
-TODO: How do you throttle the requests? Wanna know the limit of the server.
+Since filling up a disk takes too long -- simulating a long-running
+applications --, we do a small scale experiment with the same storage to memory
+ratio.
+- The data request patterns follows a Zipian distribution with the access
+  frequencies of the records are in the reverse order of the record age: the
+  younger the record, the more frequently accessed it is. For example, the 5%
+  of the youngest records get a 95% of the requests. The numbers are
+  configurable with the Zipian constant.
+- When you increase the number of records and the file system cache size
+  proportionally, which is when you increase the disk size and RAM size
+  proportionally, you should get the same file system cache miss ratio (the
+  same number of disk IOs per request).
+- CPU and network remain the same. They will affect the scalability of the
+  system. Database IOPS.
+- Memory to disk ratios of high IO instances, which are the recommended
+  instance types for serving NoSQL databases.
+    Model      vCPU Mem (GiB) Storage (GB) storage/mem
+    i2.xlarge     4      30.5  1 x 800 SSD      26.230
+    i2.2xlarge    8        61  2 x 800 SSD      26.230
+    i2.4xlarge   16       122  4 x 800 SSD      26.230
+    i2.8xlarge   32       244  8 x 800 SSD      26.230
+    scaled down   8         2       52.459      26.230
+  - TODO: You need to start from after the OS and DB server memory footprint.
+    Measure and start from there!
+- Increasing the record size is another way of filling up the disk fast. 20
+  KB/record, for now.
 
-TODO: Does a small memory node experiment reasonable? How much simulation
-speedup assumption is reasonable?
+TODO: explore max SSTable size and its effect on the latency vs cost trade-off.
+- In general, you get a lower latency with bigger SSTable sizes and a smaller
+  the number of SSTables. That's why you do SSTable compations.
+- However, a coarse-grained SSTable classification gives you a less efficient
+  SSTable placement, resulting in a higher storage cost under a latency SLO;
+  you don't migrate SSTables as quickly as when they are smaller when they
+  become cold.
+- As the number of SSTables go down to a very small number, the classification
+  and migration becomes harder.
+- The problem becomes worse as you go down the hierarchy of the storage, since
+  SSTables become bigger from compactions as they age.
+  - A migration from s_n to s_(n+1) is worse than a migration from s_(n-1) to
+    s_n.
+- TODO: Draw a timeline diagram of SSTable migrations
 
-Without memory reduction, I see this big SSTables.
+
+SSTable sizes without memory capping.
   $ ll *-Data.db -h
   -rw-rw-r-- 1 ubuntu ubuntu 437M Sep  6 05:02 mc-1-big-Data.db
   -rw-rw-r-- 1 ubuntu ubuntu 438M Sep  6 05:03 mc-2-big-Data.db
 
-TODO: I think STCS is the default CS.
-
-TODO: Tablet max size. If you want to have 3 or more levels, you will want the
-SSTables in the 2nd level not too big. You can probably cap the max size. Then,
-what would be the impact to the performance?
+TODO: STCS is the default CS. Hope I can make a fair comparison with the other
+databases.
 
 I don't see any read activity at all, which is what was expected.
 
 TODO: Make Cassandra generate some read IOs.
-
-Simulation duration: 5 year. I think it should be okay.
-
-Run experiment in the screen and detach before leaving it run. Too much
-terminal output could cost a lot of money!
-
-With 100 threads, the server seems to be saturated. Even with 50.
 
 TODO: Plot read and write latencies for different throughputs
 
@@ -37,12 +65,23 @@ TODO: How to trace the cql statements that the Cassandra server serves?
 
 TODO: Want to monior CPU and disk IOs of the server
 
+TODO: Explore performance by varying the Zipian constant
+TODO: Compare with the Facebook workload
+TODO: Scale to 3 nodes? Probably yes. When the single-node experiment is done.
 
+Thoughts
+--------
+Request throttling
+- Although, the read / write paths are the same regardless of the load, when
+  the load is heavier, the latency will be bigger.  For instance, from more IO
+  contention and heavier request queue management.
+- What would be the representative one, if you have to pick one? At the 50% of
+  capacity? No throttling for now.
+- TODO: This should be an evaulation item: scalability. How much load can a
+  server sustain? How Mutants helps increase the scalability. By showing the
+  throughput vs latency plot.
 
-Low priority
-------------
-I wonder what and when ycsb writes and reads exactly. Time to look into
-the code.
+What and when YCSB writes and reads.
 - Write key is incremented sequentially from recordcount. When converted to a
   string value, it is either hashed (when orderedinserts = false, the default
   value) or not. For Mutants, it doesn't mater.  What matters is the access
@@ -52,8 +91,6 @@ the code.
   inserted values. Don't need to understand the exact formula.  I think it
   gives a more accurate curve at the right end than my Facebook workload
   generator.
-  - TODO: Would be a small interesting point in the evaluation.
-  - TODO: Explore the Zipian constant
 
 Do you need transactions? Probably not.
 - For Facebook-like applications, you won't need transactions most of the time.
@@ -64,9 +101,17 @@ Do you need transactions? Probably not.
   - https://docs.datastax.com/en/cassandra/2.1/cassandra/dml/dml_atomicity_c.html
 - TODO: What about other DBs?
 
-TODO: Scale to 3 nodes? Probably yes. When the deployment is done.
-
 -------------------------------------------------------------------------------
+
+Simulation duration
+- I don't think a concrete number matters, except for the Facebook workload
+  experiment.
+
+Run experiment in the screen and detach before leaving it run. Too much
+terminal output could cost a lot of money!
+
+With 100 threads, the server seems to be saturated. Even with 50. Cause they
+make requests without throttling.
 
 Making SSTables grow fast enough.
 - The default record size is 1 KB. Make it 20 KB.
