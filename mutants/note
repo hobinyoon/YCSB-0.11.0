@@ -1,5 +1,33 @@
 High priority
 -------------
+TODO: Plot latencies of workloads
+- Record size 40 KB.
+
+
+TODO: STCS is the default CS. Hope I can make a fair comparison with the other
+databases.
+
+I don't see any read activity at all, which is what was expected.
+
+TODO: Make Cassandra generate some read IOs.
+
+TODO: How to trace the cql statements that the Cassandra server serves?
+- This might be a close thing
+  - https://www.ibm.com/support/knowledgecenter/SS3JSW_5.2.0/com.ibm.help.gdha_reference.doc/com.ibm.help.gdha_troubleshooting.doc/gdha_enabling_tracing.html
+- Another idea is to look for the source code and figure out where to insert
+	the statement. I think this is what I did during the development.
+
+TODO: Monior CPU and disk IOs of the server
+
+TODO: Explore performance by varying the Zipian constant
+
+TODO: Compare with the Facebook workload
+
+TODO: Scale to 3 nodes? Probably yes. When the single-node experiment is done.
+
+
+Thoughts worth making it to the paper
+-------------------------------------
 Since filling up a disk takes too long -- simulating a long-running
 applications --, we do a small scale experiment with the same storage to memory
 ratio.
@@ -42,35 +70,6 @@ TODO: explore max SSTable size and its effect on the latency vs cost trade-off.
     s_n.
 - TODO: Draw a timeline diagram of SSTable migrations
 
-
-SSTable sizes without memory capping.
-  $ ll *-Data.db -h
-  -rw-rw-r-- 1 ubuntu ubuntu 437M Sep  6 05:02 mc-1-big-Data.db
-  -rw-rw-r-- 1 ubuntu ubuntu 438M Sep  6 05:03 mc-2-big-Data.db
-
-TODO: STCS is the default CS. Hope I can make a fair comparison with the other
-databases.
-
-I don't see any read activity at all, which is what was expected.
-
-TODO: Make Cassandra generate some read IOs.
-
-TODO: Plot read and write latencies for different throughputs
-
-TODO: How to trace the cql statements that the Cassandra server serves?
-- This might be a close thing
-  - https://www.ibm.com/support/knowledgecenter/SS3JSW_5.2.0/com.ibm.help.gdha_reference.doc/com.ibm.help.gdha_troubleshooting.doc/gdha_enabling_tracing.html
-- Another idea is to look for the source code and figure out where to insert
-	the statement. I think this is what I did during the development.
-
-TODO: Want to monior CPU and disk IOs of the server
-
-TODO: Explore performance by varying the Zipian constant
-TODO: Compare with the Facebook workload
-TODO: Scale to 3 nodes? Probably yes. When the single-node experiment is done.
-
-Thoughts
---------
 Request throttling
 - Although, the read / write paths are the same regardless of the load, when
   the load is heavier, the latency will be bigger.  For instance, from more IO
@@ -101,64 +100,7 @@ Do you need transactions? Probably not.
   - https://docs.datastax.com/en/cassandra/2.1/cassandra/dml/dml_atomicity_c.html
 - TODO: What about other DBs?
 
--------------------------------------------------------------------------------
-
-Simulation duration
-- I don't think a concrete number matters, except for the Facebook workload
-  experiment.
-
-Run experiment in the screen and detach before leaving it run. Too much
-terminal output could cost a lot of money!
-
-With 100 threads, the server seems to be saturated. Even with 50. Cause they
-make requests without throttling.
-
-Making SSTables grow fast enough.
-- The default record size is 1 KB. Make it 20 KB.
-  - Inserting 500,516 records. So, about 500 MB. Takes about 6 mins.
-- Make it 20 times more bigger. Make the total size to 10GB.
-  from fieldcount=10, fieldlength=100 to fieldcount=10, fieldlength=2000
-  - Better fix the fieldcount. It needs a recreation of the table.
-  - How long does it take? About 30 mins.
-  - SSTables. A bit less than 10 GB.
-    $ ll *-Data.db -h
-    -rw-rw-r-- 1 ubuntu ubuntu 6.9G Sep  6 05:30 mc-22-big-Data.db
-    -rw-rw-r-- 1 ubuntu ubuntu 1.8G Sep  6 05:28 mc-26-big-Data.db
-    -rw-rw-r-- 1 ubuntu ubuntu 438M Sep  6 05:25 mc-27-big-Data.db
-  - The fields contain random strings. The network- or storage-level
-    compression won't have a meaningful impact.
-
-The Measurements class seems to have all latencies plus some extra JVM info.
-- Do I need latencies of all operations? Or just a 10-sec summary? 10-sec
-  summary might be just fine for now. If needed later, make it smaller like 1
-  sec.
-
-Too much Cassandra GCs. After restoring JVM heap size to default, I don't see
-the message any more. Also, a lot higher throughput now. 40K IOPS.
-
-What happens if you run a workload without loading?
-- "workload a" gets "read-failed". It's okay.
-- "workload d" gets "read-failed" too. A "run" expects some records exist
-  initially. As more records are inserted, "read latest" picks recently
-  inserted values more.
-
-YCSB's _dotransactions is not a DB transaction; a group of atomic operations.
-It is "Whether or not this is the transaction phase (run) or not (load).".  It
-is set by default when in a "run" mode.
-
-Entry point:
-	core/src/main/java/com/yahoo/ycsb/Client.java main()
-
-YCSB Build:
-- mvn -pl com.yahoo.ycsb:cassandra-binding -am clean package -DskipTests
-- Disabled the annoying checkstyle errors.
-
-ycsb workloade d generates data on the fly.
-
-nodetool drain seems to dump MemTable to a SSTable. You can measure the size
-easily that way.  It doesn't seem to accecpt any new connections after that.
-
-What's the network connection like between the client and the server nodes?
+The network connection between the client and the server nodes
 - Latency. ping.
 	10 packets transmitted, 10 received, 0% packet loss, time 9000ms
 	rtt min/avg/max/mdev = 0.412/0.458/0.496/0.028 ms
@@ -189,6 +131,66 @@ What's the network connection like between the client and the server nodes?
 		15  100.92.240.67 (100.92.240.67)  17.670 ms 100.92.240.87 (100.92.240.87)  17.122 ms 100.92.240.139 (100.92.240.139)  15.880 ms
 		16  216.182.224.114 (216.182.224.114)  19.554 ms 216.182.224.96 (216.182.224.96)  17.339 ms 216.182.224.114 (216.182.224.114)  19.513 ms
 		17  ec2-54-145-43-45.compute-1.amazonaws.com (54.145.43.45)  0.430 ms  0.430 ms  0.424 ms
+
+Misc
+----
+Simulation duration
+- I don't think a concrete number matters, except for the Facebook workload
+  experiment.
+
+Run experiment in the screen and detach before leaving it run. Too much
+terminal output could cost a lot of money!
+
+With 100 threads, the server seems to be saturated. Even with 50. Cause they
+make requests without throttling.
+
+SSTable size growth
+- The default record size is 1 KB. Make it 20 KB.
+  - Inserting 500,516 records. So, about 500 MB. Takes about 6 mins.
+- Make it 20 times more bigger. Make the total size to 10GB.
+  from fieldcount=10, fieldlength=100 to fieldcount=10, fieldlength=2000
+  - Better fix the fieldcount, otherwise you need to change the table schema.
+  - Without memory capping on a c3.2xlarge node with a 15 GiB of memory.
+  - Takes about 30 mins.
+  - Initial sizes
+    $ ll *-Data.db -h
+    -rw-rw-r-- 1 ubuntu ubuntu 437M Sep  6 05:02 mc-1-big-Data.db
+    -rw-rw-r-- 1 ubuntu ubuntu 438M Sep  6 05:03 mc-2-big-Data.db
+  - When done. A bit less than 10 GB.
+    $ ll *-Data.db -h
+    -rw-rw-r-- 1 ubuntu ubuntu 6.9G Sep  6 05:30 mc-22-big-Data.db
+    -rw-rw-r-- 1 ubuntu ubuntu 1.8G Sep  6 05:28 mc-26-big-Data.db
+    -rw-rw-r-- 1 ubuntu ubuntu 438M Sep  6 05:25 mc-27-big-Data.db
+  - The fields contain random strings. The network- or storage-level
+    compression won't have a meaningful impact.
+
+The Measurements class seems to have all latencies plus some extra JVM info.
+- A 1-sec summary looks fine for now.
+
+Too much Cassandra GCs. After restoring JVM heap size to default, I don't see
+the message any more. Also, a lot higher throughput now. 40K IOPS.
+
+What happens if you run a workload without loading?
+- "workload a" gets "read-failed". It's okay.
+- "workload d" gets "read-failed" too. A "run" expects some records exist
+  initially. As more records are inserted, "read latest" picks recently
+  inserted values more.
+
+YCSB's _dotransactions is not a DB transaction; a group of atomic operations.
+It is "Whether or not this is the transaction phase (run) or not (load).".  It
+is set by default when in a "run" mode.
+
+Entry point:
+	core/src/main/java/com/yahoo/ycsb/Client.java main()
+
+YCSB Build:
+- mvn -pl com.yahoo.ycsb:cassandra-binding -am clean package -DskipTests
+- Disabled the annoying checkstyle errors.
+
+ycsb workloade d generates data on the fly.
+
+nodetool drain seems to dump MemTable to a SSTable. You can measure the size
+easily that way.  It doesn't seem to accecpt any new connections after that.
 
 What is a good level of concurrency? how many threads? As long as you use the
 same number for the unmodified Cassandra and Mutants, you should be fine.
