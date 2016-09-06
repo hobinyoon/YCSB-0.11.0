@@ -1,5 +1,31 @@
+High priority
+-------------
+The SSTables dont' grow as fast as I wanted.
+- Inserting 500516 records. So, about 500 MB. Takes about 6 mins.
+- The default record size is 1 KB. Make it 20 KB.
+- Make it 20 times more bigger. Make it to 10 GB.
+  from fieldcount=10, fieldlength=100
+  to fieldcount=10, fieldlength=2000
+    - Better fix the fieldcount. It needs a recreation of the table.
+- TODO: Does a small memory node experiment reasonable? How much simulation
+  speedup assumption is reasonable?
+
+Without memory reduction, I see this big SSTables.
+  $ ll *-Data.db -h
+  -rw-rw-r-- 1 ubuntu ubuntu 437M Sep  6 05:02 mc-1-big-Data.db
+  -rw-rw-r-- 1 ubuntu ubuntu 438M Sep  6 05:03 mc-2-big-Data.db
+
+I don't see any read activity at all, which is what was expected.
+
+TODO: Make Cassandra generate some read IOs.
 
 
+Run experiment in the screen and detach before leaving it run. Too much
+terminal output could cost a lot of money!
+
+With 100 threads, the server seems to be saturated. Even with 50.
+
+TODO: How do you throttle the requests?
 
 TODO: Plot read and write latencies for different throughputs
 
@@ -9,11 +35,12 @@ TODO: How to trace the cql statements that the Cassandra server serves?
 - Another idea is to look for the source code and figure out where to insert
 	the statement. I think this is what I did during the development.
 
+TODO: Want to monior CPU and disk IOs of the server
 
 
 
-
-
+Low priority
+------------
 I wonder what and when ycsb writes and reads exactly. Time to look into
 the code.
 - Write key is incremented sequentially from recordcount. When converted to a
@@ -39,10 +66,15 @@ Do you need transactions? Probably not.
 
 TODO: Scale to 3 nodes? Probably yes. When the deployment is done.
 
-TODO: What does the measurement do? Something useful that I can use?
-- core/src/main/java/com/yahoo/ycsb/measurements/*
-
 -------------------------------------------------------------------------------
+
+The Measurements class seems to have all latencies plus some extra JVM info.
+- Do I need latencies of all operations? Or just a 10-sec summary? 10-sec
+  summary might be just fine for now. If needed later, make it smaller like 1
+  sec.
+
+Too much Cassandra GCs. After restoring JVM heap size to default, I don't see
+the message any more. Also, a lot higher throughput now. 40K IOPS.
 
 What happens if you run a workload without loading?
 - "workload a" gets "read-failed". It's okay.
