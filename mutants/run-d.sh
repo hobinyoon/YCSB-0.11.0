@@ -21,6 +21,9 @@ time -p mutants/load.sh
 echo
 sleep 0.1
 
+# Throttle op/s
+#   -target 100 \
+
 time -p bin/ycsb run cassandra-cql \
 -P workloads/workloadd \
 -s \
