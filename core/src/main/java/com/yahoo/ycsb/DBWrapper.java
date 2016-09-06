@@ -93,6 +93,8 @@ public class DBWrapper extends DB
    * Initialize any state for this DB.
    * Called once per DB instance; there is one DB instance per client thread.
    */
+  private static Object _init_err_msg_lock = new Object();
+  private static boolean _init_err_msg_printed = false;
   public void init() throws DBException
   {
     try (final TraceScope span = _tracer.newScope(SCOPE_STRING_INIT)) {
@@ -111,9 +113,15 @@ public class DBWrapper extends DB
         }
       }
 
-      System.err.println("DBWrapper: report latency for each error is " +
-          this.reportLatencyForEachError + " and specific error codes to track" +
-          " for latency are: " + this.latencyTrackedErrors.toString());
+      // Print only once. Too much of these. 1000 for 1000 threads.
+      synchronized (_init_err_msg_lock) {
+        if (! _init_err_msg_printed) {
+          System.err.println("DBWrapper: report latency for each error is " +
+              this.reportLatencyForEachError + " and specific error codes to track" +
+              " for latency are: " + this.latencyTrackedErrors.toString());
+          _init_err_msg_printed = true;
+        }
+      }
     }
   }
 
