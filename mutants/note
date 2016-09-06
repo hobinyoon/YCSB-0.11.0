@@ -1,31 +1,31 @@
 High priority
 -------------
-The SSTables dont' grow as fast as I wanted.
-- Inserting 500516 records. So, about 500 MB. Takes about 6 mins.
-- The default record size is 1 KB. Make it 20 KB.
-- Make it 20 times more bigger. Make it to 10 GB.
-  from fieldcount=10, fieldlength=100
-  to fieldcount=10, fieldlength=2000
-    - Better fix the fieldcount. It needs a recreation of the table.
-- TODO: Does a small memory node experiment reasonable? How much simulation
-  speedup assumption is reasonable?
+TODO: How do you throttle the requests? Wanna know the limit of the server.
+
+TODO: Does a small memory node experiment reasonable? How much simulation
+speedup assumption is reasonable?
 
 Without memory reduction, I see this big SSTables.
   $ ll *-Data.db -h
   -rw-rw-r-- 1 ubuntu ubuntu 437M Sep  6 05:02 mc-1-big-Data.db
   -rw-rw-r-- 1 ubuntu ubuntu 438M Sep  6 05:03 mc-2-big-Data.db
 
+TODO: I think STCS is the default CS.
+
+TODO: Tablet max size. If you want to have 3 or more levels, you will want the
+SSTables in the 2nd level not too big. You can probably cap the max size. Then,
+what would be the impact to the performance?
+
 I don't see any read activity at all, which is what was expected.
 
 TODO: Make Cassandra generate some read IOs.
 
+Simulation duration: 5 year. I think it should be okay.
 
 Run experiment in the screen and detach before leaving it run. Too much
 terminal output could cost a lot of money!
 
 With 100 threads, the server seems to be saturated. Even with 50.
-
-TODO: How do you throttle the requests?
 
 TODO: Plot read and write latencies for different throughputs
 
@@ -67,6 +67,21 @@ Do you need transactions? Probably not.
 TODO: Scale to 3 nodes? Probably yes. When the deployment is done.
 
 -------------------------------------------------------------------------------
+
+Making SSTables grow fast enough.
+- The default record size is 1 KB. Make it 20 KB.
+  - Inserting 500,516 records. So, about 500 MB. Takes about 6 mins.
+- Make it 20 times more bigger. Make the total size to 10GB.
+  from fieldcount=10, fieldlength=100 to fieldcount=10, fieldlength=2000
+  - Better fix the fieldcount. It needs a recreation of the table.
+  - How long does it take? About 30 mins.
+  - SSTables. A bit less than 10 GB.
+    $ ll *-Data.db -h
+    -rw-rw-r-- 1 ubuntu ubuntu 6.9G Sep  6 05:30 mc-22-big-Data.db
+    -rw-rw-r-- 1 ubuntu ubuntu 1.8G Sep  6 05:28 mc-26-big-Data.db
+    -rw-rw-r-- 1 ubuntu ubuntu 438M Sep  6 05:25 mc-27-big-Data.db
+  - The fields contain random strings. The network- or storage-level
+    compression won't have a meaningful impact.
 
 The Measurements class seems to have all latencies plus some extra JVM info.
 - Do I need latencies of all operations? Or just a 10-sec summary? 10-sec
