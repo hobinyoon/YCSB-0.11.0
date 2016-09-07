@@ -1,7 +1,65 @@
 High priority
 -------------
-TODO: Plot latencies of workloads
-- Record size 40 KB.
+TODO: Plot latencies of workloads after shrinking the memory.
+
+
+
+
+Limiting memory size, thus limiting filesystem cache size.
+- Can you do it with cgroup [https://wiki.archlinux.org/index.php/cgroups]?
+
+	cgroup
+	memory.stat
+
+- Test: Read files of specified total size sequentially in rotation and check
+	if you see any slowdown from the second round.
+	- TODO: fast generation of random data
+
+
+
+
+TODO: Can you control the memory size for the filesystem cache?
+- TODO: You can do a simple experiment and see if the performance is dropping.
+- TODO: Look into what visualization vmtouch does. What are cached and what are not.
+
+TODO: Do hypervisors cache file system blocks? Not sure. Probably not.
+- TODO: Look into this. http://xenserver.org/discuss-virtualization/virtualization-blog/entry/read-caching.html
+- TODO: If sharing, wow do you allocate memory to different VMs?
+
+
+
+
+
+
+
+
+A read-only flat-keyed file which exists on non-root cgroups.
+
+This breaks down the cgroup's memory footprint into different
+types of memory, type-specific details, and other information
+on the state and past events of the memory management system.
+
+All memory amounts are in bytes.
+
+The entries are ordered to be human readable, and new entries
+can show up in the middle. Don't rely on items remaining in a
+fixed position; use the keys to look up specific values!
+
+anon
+
+Amount of memory used in anonymous mappings such as
+brk(), sbrk(), and mmap(MAP_ANONYMOUS)
+
+file
+
+Amount of memory used to cache filesystem data,
+including tmpfs and shared memory.
+
+
+TODO: What's the effect on reliability when you introduce multiple storages?
+
+
+
 
 
 TODO: STCS is the default CS. Hope I can make a fair comparison with the other
@@ -24,6 +82,21 @@ TODO: Explore performance by varying the Zipian constant
 TODO: Compare with the Facebook workload
 
 TODO: Scale to 3 nodes? Probably yes. When the single-node experiment is done.
+
+Quizup redis data
+-----------------
+Field format
+	Timestamp
+	IP addr of the client
+	Command
+	Parameters specific to each command
+
+TODO: Figure out the format. Do it with the 1% of the data and ask Ymir.
+
+Redis commands: http://redis.io/commands
+
+TODO: check and see Ymir's dataset suggestions. See if you can find
+long-running application traces.
 
 
 Thoughts worth making it to the paper
@@ -134,6 +207,17 @@ The network connection between the client and the server nodes
 
 Misc
 ----
+Caching at the hypervisor level vs. VM level.
+- "Unlike hypervisor caching, however, guest level caching is performed at the
+	file level, so as a result, specific data sets can be pinned into cache right
+	from the beginning to deliver an immediate cache benefit to performance
+	demanding applications. Cache pinning certain data sets obviates the need to
+	wait for cache warming to run its course; which can be particularly
+	beneficial for applications that have hit a performance wall on conventional
+	storage."
+	[http://www.storage-switzerland.com/Blog/Entries/2013/8/15_Comparing_VMware_Caching_Techniques_-_Guest_vs._Hypervisor.html'
+	So, I'm guessing xen is not caching blocks.
+
 Simulation duration
 - I don't think a concrete number matters, except for the Facebook workload
   experiment.
