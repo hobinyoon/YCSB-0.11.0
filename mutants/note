@@ -1,60 +1,26 @@
 High priority
 -------------
-
-Limiting memory size, thus limiting filesystem cache size.
-- Can you do it with cgroup [https://wiki.archlinux.org/index.php/cgroups]?
-
-	cgroup
-	memory.stat
-
-	- TODO: What if the requested file block is already cached in the file system
-		cache? cgroup will still not use it?
-
-- Test: Read files of specified total size sequentially in rotation and check
-	if you see any slowdown from the second round.
-	- TODO: fast generation of random data
-
-
+TODO: where are all the different notes? Put together them in one place.
 
 TODO: Plot latencies of workloads after shrinking the memory.
 
 
-TODO: Can you control the memory size for the filesystem cache?
-- TODO: You can do a simple experiment and see if the performance is dropping.
-- TODO: Look into what visualization vmtouch does. What are cached and what are not.
-
-TODO: Do hypervisors cache file system blocks? Not sure. Probably not.
-- TODO: Look into this. http://xenserver.org/discuss-virtualization/virtualization-blog/entry/read-caching.html
-- TODO: If sharing, wow do you allocate memory to different VMs?
 
 
+Quizup redis data
+- Field format
+		Timestamp
+		IP addr of the client
+		Command
+		Parameters specific to each command
+- TODO: Check out their request frequencies by obj ages.
+- TODO: Figure out the format. Do it with the 1% of the data and ask Ymir.
+- TODO: check and see Ymir's dataset suggestions. See if you can find
+	long-running application traces.
+- Redis commands: http://redis.io/commands
 
 
 
-
-
-
-A read-only flat-keyed file which exists on non-root cgroups.
-
-This breaks down the cgroup's memory footprint into different
-types of memory, type-specific details, and other information
-on the state and past events of the memory management system.
-
-All memory amounts are in bytes.
-
-The entries are ordered to be human readable, and new entries
-can show up in the middle. Don't rely on items remaining in a
-fixed position; use the keys to look up specific values!
-
-anon
-
-Amount of memory used in anonymous mappings such as
-brk(), sbrk(), and mmap(MAP_ANONYMOUS)
-
-file
-
-Amount of memory used to cache filesystem data,
-including tmpfs and shared memory.
 
 
 TODO: What's the effect on reliability when you introduce multiple storages?
@@ -83,21 +49,6 @@ TODO: Explore performance by varying the Zipian constant
 TODO: Compare with the Facebook workload
 
 TODO: Scale to 3 nodes? Probably yes. When the single-node experiment is done.
-
-Quizup redis data
------------------
-Field format
-	Timestamp
-	IP addr of the client
-	Command
-	Parameters specific to each command
-
-TODO: Figure out the format. Do it with the 1% of the data and ask Ymir.
-
-Redis commands: http://redis.io/commands
-
-TODO: check and see Ymir's dataset suggestions. See if you can find
-long-running application traces.
 
 
 Thoughts worth making it to the paper
@@ -208,6 +159,41 @@ The network connection between the client and the server nodes
 
 Misc
 ----
+You can limit memory size, thus limit file system cache size.
+- https://www.kernel.org/doc/Documentation/cgroup-v1/memory.txt
+- If a requested file block is already cached in the file system cache, it is
+	still be used by the process under cgroup, regardless of the memory limit.
+	Makes sense.
+
+vmtouch
+- You can visualize which part of the files are cached.
+	hobin@mts7:~/work/mutants/misc/cgroup-test$ vmtouch -v .test-data/
+	.test-data/03
+	[  oOo      oOOOOo      oOo      oOOOOo     oOOo     oOOOOOo ] 960/2560
+	.test-data/06
+	[OOOOOOOOOOOOOo      oOOOOOOOOOOOOOo     oOOOOOOOOOOOOOOo    ] 1793/2560
+	.test-data/05
+	[Oo      oOo      oOOOOo      oOo     oOOOOOo     oOOo     oO] 831/2560
+	.test-data/04
+	[     oOo      oOOOOo      oOo      OOOOOo     oOOo     oOOOO] 895/2560
+	.test-data/08
+	[                                                            ] 0/2560
+	.test-data/02
+	[            oo      oOo      oOOOOo     oOOo     oOOOOOo    ] 700/2560
+	.test-data/07
+	[  oOOOOOOOOOOOOOo      oOOOOOOOOOOOOOo     oOOOOOOOOOOOOOOOO] 1887/2560
+	.test-data/01
+	[                                                            ] 0/2560
+	.test-data/00
+	[ o                                                          ] 10/2560
+	.test-data/09
+	[                                                            ] 0/2560
+						 Files: 10
+			 Directories: 1
+		Resident Pages: 7076/25600  27M/100M  27.6%
+					 Elapsed: 0.003181 seconds
+- You can also lock or unlock parts of files!
+
 Caching at the hypervisor level vs. VM level.
 - "Unlike hypervisor caching, however, guest level caching is performed at the
 	file level, so as a result, specific data sets can be pinned into cache right
@@ -217,7 +203,9 @@ Caching at the hypervisor level vs. VM level.
 	beneficial for applications that have hit a performance wall on conventional
 	storage."
 	[http://www.storage-switzerland.com/Blog/Entries/2013/8/15_Comparing_VMware_Caching_Techniques_-_Guest_vs._Hypervisor.html'
-	So, I'm guessing xen is not caching blocks.
+- So, I'm guessing xen is not caching blocks. If it does, there are too much
+	parameters to consider; for example, how do you allocate memory to different
+	VMs? Better leave it to VMs.
 
 Simulation duration
 - I don't think a concrete number matters, except for the Facebook workload
