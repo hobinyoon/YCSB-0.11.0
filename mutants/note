@@ -1,9 +1,5 @@
 High priority
 -------------
-TODO: Plot latencies of workloads after shrinking the memory.
-
-
-
 
 Limiting memory size, thus limiting filesystem cache size.
 - Can you do it with cgroup [https://wiki.archlinux.org/index.php/cgroups]?
@@ -11,11 +7,16 @@ Limiting memory size, thus limiting filesystem cache size.
 	cgroup
 	memory.stat
 
+	- TODO: What if the requested file block is already cached in the file system
+		cache? cgroup will still not use it?
+
 - Test: Read files of specified total size sequentially in rotation and check
 	if you see any slowdown from the second round.
 	- TODO: fast generation of random data
 
 
+
+TODO: Plot latencies of workloads after shrinking the memory.
 
 
 TODO: Can you control the memory size for the filesystem cache?
