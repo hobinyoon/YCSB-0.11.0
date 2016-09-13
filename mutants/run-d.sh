@@ -8,12 +8,12 @@ DN_THIS=`dirname $BASH_SOURCE`
 pushd $DN_THIS/.. >/dev/null
 
 DATETIME=`date +"%y%m%d-%H%M%S"`
-YCSB_LOG="mutants/.log/"$DATETIME"-d"
+DN_YCSB_LOG=$HOME"/work/mutants/log-volatile/ycsb"
+mkdir -p $DN_YCSB_LOG
+FN_YCSB_LOG=$DN_YCSB_LOG"/"$DATETIME"-d"
 
-mkdir -p "mutants/.log"
+mutants/_run-d.sh 2>&1 | tee -a $FN_YCSB_LOG | grep --color=always -E "^|Mutants"
 
-mutants/_run-d.sh 2>&1 | tee -a $YCSB_LOG | grep --color=always -E "^|Mutants"
-
-printf "Created %s %d\n" $YCSB_LOG `wc -c < $YCSB_LOG`
+printf "Created %s %d\n" $FN_YCSB_LOG `wc -c < $FN_YCSB_LOG`
 
 popd >/dev/null

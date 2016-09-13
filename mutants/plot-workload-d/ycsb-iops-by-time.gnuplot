@@ -31,7 +31,7 @@ set xlabel "Time (hour)" offset 0,0.3
 set ylabel "IOPS" offset -0.2,0
 
 set xrange[0:]
-set yrange[40:40000]
+set yrange[30:20000]
 
 set logscale y
 

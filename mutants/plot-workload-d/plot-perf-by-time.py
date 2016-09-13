@@ -11,7 +11,7 @@ import Util
 
 _dn_stat = "%s/.stat" % os.path.dirname(__file__)
 _dn_ycsb_log = "%s/work/mutants/log/ycsb" % os.path.expanduser("~")
-_log_id = "160912-234955-d"
+_log_id = "160913-171610-d"
 _fn_stat = None
 
 
@@ -55,7 +55,10 @@ def GenPlotData():
 						break
 					sps.append(StatPerSec(line))
 
-		TIME_GRANULARITY_IN_SEC = 36 * 5
+		timerange = sps[-1].timestamp - sps[0].timestamp
+
+		# Points within 1/400 of x-axis are considered to be too close.
+		TIME_GRANULARITY_IN_SEC = int(timerange / 400)
 		IOPS_GRANULARITY_IN_LOG_E = 0.01
 		with open(_fn_stat, "w") as fo:
 			StatPerSec.WriteHeader(fo)
