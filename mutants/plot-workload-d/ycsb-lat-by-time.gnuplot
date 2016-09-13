@@ -34,12 +34,12 @@ set size 1, 0.97
 set key center at graph 0.5, 1.09 maxrows 1 samplen 0.5
 
 set xrange[0:]
-#set yrange[30:20000]
+set yrange[0:70]
 
 #set logscale y
 
 plot \
 FN_IN u (-1):(1) w p pt 2 pointsize 0.6 lc rgb "red"  lw 4 t "Insert", \
 FN_IN u (-1):(1) w p pt 1 pointsize 0.6 lc rgb "blue" lw 4 t "Read", \
-FN_IN u ($1/3600):($5 == -1 ? 1/0 : $5/1000) w p pt 2 pointsize 0.3 lc rgb "red"  not, \
-FN_IN u ($1/3600):($3 == -1 ? 1/0 : $3/1000) w p pt 1 pointsize 0.3 lc rgb "blue" not
+FN_IN u ($1/3600):($5 == -1 ? 1/0 : ($5 == 0 ? 1/0 : $5/1000)) w p pt 2 pointsize 0.3 lc rgb "red"  not, \
+FN_IN u ($1/3600):($3 == -1 ? 1/0 : ($3 == 0 ? 1/0 : $3/1000)) w p pt 1 pointsize 0.3 lc rgb "blue" not

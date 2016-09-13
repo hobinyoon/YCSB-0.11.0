@@ -101,10 +101,13 @@ def GenPlotData():
 							break
 
 		# Reduce overlapped points - latency
-		lat_max = 0
-		for s in sps:
-			lat_max = max(lat_max, s.read_lat_avg, s.ins_lat_avg)
-		LAT_GRANULARITY = int(lat_max / 200)
+		#
+		# Calculate max latency manually. There were 3 outliers as big as 350 ms.
+		#lat_max = 0
+		#for s in sps:
+		#	lat_max = max(lat_max, s.read_lat_avg, s.ins_lat_avg)
+		lat_max = 70000
+		LAT_GRANULARITY = int(lat_max / 100)
 
 		for i in range(len(sps)):
 			if (i < TIME_GRANULARITY_IN_SEC):

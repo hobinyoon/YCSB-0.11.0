@@ -39,7 +39,7 @@ set xrange[0:]
 #set logscale y
 
 plot \
-FN_IN u ($1/3600):($6 == -1 ? 1/0 : $6/1000) w p pt 1 pointsize 0.3 lc rgb "red" not
+FN_IN u ($1/3600):($6 == -1 ? 1/0 : ($6 == 0 ? 1/0 : $6/1000)) w p pt 1 pointsize 0.3 lc rgb "red" not
 
 #plot \
 #FN_IN u (-1):(1) w p pt 2 pointsize 0.6 lc rgb "red"  lw 4 t "Insert", \

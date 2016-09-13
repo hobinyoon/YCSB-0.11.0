@@ -39,8 +39,8 @@ time -p bin/ycsb run cassandra-cql \
 -s \
 -p hosts=`cat ~/work/mutants/.run/cassandra-server-ips` \
 -p recordcount=1000 \
--p operationcount=1000000000 \
+-p operationcount=50000000 \
 -p status.interval=1 \
 -p fieldcount=10 \
--p fieldlength=100 \
+-p fieldlength=2000 \
 -threads 100
