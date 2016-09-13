@@ -11,7 +11,8 @@ import Util
 
 _dn_stat = "%s/.stat" % os.path.dirname(__file__)
 _dn_ycsb_log = "%s/work/mutants/log/ycsb" % os.path.expanduser("~")
-_log_id = "160913-171610-d"
+_log_id = "160912-234955-d"
+#_log_id = "160913-171610-d"
 _fn_stat = None
 
 
@@ -57,31 +58,75 @@ def GenPlotData():
 
 		timerange = sps[-1].timestamp - sps[0].timestamp
 
+		# Reduce the output file size by skipping points that would overwrite on
+		# existing points. For those points, the values are set to -1.
+		#
 		# Points within 1/400 of x-axis are considered to be too close.
 		TIME_GRANULARITY_IN_SEC = int(timerange / 400)
-		IOPS_GRANULARITY_IN_LOG_E = 0.01
+
+		# We don't need separate IOPSes for read and write.
+		#
+		#IOPS_GRANULARITY_IN_LOG_E = 0.01
+		#for i in range(len(sps)):
+		#	if (i < TIME_GRANULARITY_IN_SEC):
+		#		continue
+		#	if sps[i].read_iops > 0:
+		#		cur_read_iops = math.log(sps[i].read_iops, 10)
+		#		for j in range(1, TIME_GRANULARITY_IN_SEC):
+		#			if sps[i - j].read_iops > 0:
+		#				if math.fabs(cur_read_iops - math.log(sps[i - j].read_iops, 10)) < IOPS_GRANULARITY_IN_LOG_E:
+		#					sps[i].read_iops = -1
+		#					break
+		#	if sps[i].ins_iops > 0:
+		#		cur_ins_iops = math.log(sps[i].ins_iops, 10)
+		#		for j in range(1, TIME_GRANULARITY_IN_SEC):
+		#			if sps[i - j].ins_iops > 0:
+		#				if math.fabs(cur_ins_iops - math.log(sps[i - j].ins_iops, 10)) < IOPS_GRANULARITY_IN_LOG_E:
+		#					sps[i].ins_iops = -1
+		#					break
+
+		iops_max = 0
+		for s in sps:
+			iops_max = max(iops_max, s.iops)
+		IOPS_GRANULARITY = int(iops_max / 200)
+
+		for i in range(len(sps)):
+			if (i < TIME_GRANULARITY_IN_SEC):
+				continue
+			if sps[i].iops > 0:
+				for j in range(1, TIME_GRANULARITY_IN_SEC):
+					if sps[i - j].iops > 0:
+						if math.fabs(sps[i].iops - sps[i - j].iops) < IOPS_GRANULARITY:
+							sps[i].iops = -1
+							break
+
+		# Reduce overlapped points - latency
+		lat_max = 0
+		for s in sps:
+			lat_max = max(lat_max, s.read_lat_avg, s.ins_lat_avg)
+		LAT_GRANULARITY = int(lat_max / 200)
+
+		for i in range(len(sps)):
+			if (i < TIME_GRANULARITY_IN_SEC):
+				continue
+			if sps[i].read_lat_avg > 0:
+				for j in range(1, TIME_GRANULARITY_IN_SEC):
+					if sps[i - j].read_lat_avg > 0:
+						if math.fabs(sps[i].read_lat_avg - sps[i - j].read_lat_avg) < LAT_GRANULARITY:
+							sps[i].read_lat_avg = -1
+							break
+			if sps[i].ins_lat_avg > 0:
+				for j in range(1, TIME_GRANULARITY_IN_SEC):
+					if sps[i - j].ins_lat_avg > 0:
+						if math.fabs(sps[i].ins_lat_avg - sps[i - j].ins_lat_avg) < LAT_GRANULARITY:
+							sps[i].ins_lat_avg = -1
+							break
+
 		with open(_fn_stat, "w") as fo:
 			StatPerSec.WriteHeader(fo)
-			for i in range(len(sps)):
-				# Reduce the output file size by skipping points that would overwrite on
-				# existing points. For those points, the values are set to -1.
-				if (i < TIME_GRANULARITY_IN_SEC):
-					continue
-				if sps[i].read_iops > 0:
-					log_read_iops = math.log(sps[i].read_iops, 10)
-					for j in range(1, TIME_GRANULARITY_IN_SEC):
-						if sps[i - j].read_iops > 0:
-							if math.fabs(log_read_iops - math.log(sps[i - j].read_iops, 10)) < IOPS_GRANULARITY_IN_LOG_E:
-								sps[i].read_iops = -1
-								break
-				if sps[i].ins_iops > 0:
-					log_ins_iops = math.log(sps[i].ins_iops, 10)
-					for j in range(1, TIME_GRANULARITY_IN_SEC):
-						if sps[i - j].ins_iops > 0:
-							if math.fabs(log_ins_iops - math.log(sps[i - j].ins_iops, 10)) < IOPS_GRANULARITY_IN_LOG_E:
-								sps[i].ins_iops = -1
-								break
-				fo.write("%s\n" % sps[i])
+			for s in sps:
+				fo.write("%s\n" % s)
+
 		Cons.P("Created %s %d" % (_fn_stat, os.path.getsize(_fn_stat)))
 
 
@@ -89,16 +134,23 @@ def Plot():
 	with Cons.MT("Plotting ..."):
 		fn_in = _fn_stat
 		fn_out = "%s/ycsb-iops-by-time-%s.pdf" % (_dn_stat, _log_id)
-
 		env = os.environ.copy()
 		env["FN_IN"] = fn_in
 		env["FN_OUT"] = fn_out
 		Util.RunSubp("gnuplot %s/ycsb-iops-by-time.gnuplot" % os.path.dirname(__file__), env=env)
 		Cons.P("Created %s %d" % (fn_out, os.path.getsize(fn_out)))
 
+		fn_in = _fn_stat
+		fn_out = "%s/ycsb-lat-by-time-%s.pdf" % (_dn_stat, _log_id)
+		env = os.environ.copy()
+		env["FN_IN"] = fn_in
+		env["FN_OUT"] = fn_out
+		Util.RunSubp("gnuplot %s/ycsb-lat-by-time.gnuplot" % os.path.dirname(__file__), env=env)
+		Cons.P("Created %s %d" % (fn_out, os.path.getsize(fn_out)))
+
 
 class StatPerSec:
-	fmt = "%5d %5d %8.2f %5d %8.2f"
+	fmt = "%5d %5d %8.2f %5d %8.2f %5d"
 
 	def __init__(self, line):
 		#Cons.P(line)
@@ -129,6 +181,7 @@ class StatPerSec:
 			self.ins_lat_avg = 0
 		else:
 			self.ins_lat_avg = float(mo.group("ins_lat_avg")[:-1])
+		self.iops = self.read_iops + self.ins_iops
 	
 	@staticmethod
 	def WriteHeader(fo):
@@ -138,6 +191,7 @@ class StatPerSec:
 			" read_lat_avg_in_us"
 			" ins_iops"
 			" ins_lat_avg_in_us"
+			" iops"
 			))
 
 	def __str__(self):
@@ -147,6 +201,7 @@ class StatPerSec:
 						, self.read_lat_avg
 						, self.ins_iops
 						, self.ins_lat_avg
+						, self.iops
 						)
 
 
