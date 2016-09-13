@@ -20,6 +20,7 @@ sleep 0.1
 # With p fieldcount=10 fieldlength=100 -threads 100, server CPU is the
 # bottleneck. Network around 52 MB/s.
 
+echo "Running the YCSB workload ..."
 time -p bin/ycsb run cassandra-cql \
 -P workloads/workloadd \
 -s \

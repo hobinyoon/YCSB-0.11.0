@@ -7,6 +7,7 @@ DN_THIS=`dirname $BASH_SOURCE`
 
 pushd $DN_THIS/.. >/dev/null
 
+echo "Loading the YCSB workload ..."
 bin/ycsb load cassandra-cql \
 -P workloads/workloada \
 -s \

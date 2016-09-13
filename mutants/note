@@ -1,1 +1,4 @@
+run-d.sh includes recreating Cassandra YCSB table, loading, and running the
+workload.
+
 :mksession! ~/vim-session-ycsb
