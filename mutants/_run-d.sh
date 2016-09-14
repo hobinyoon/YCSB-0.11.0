@@ -8,7 +8,7 @@ DN_THIS=`dirname $BASH_SOURCE`
 
 time -p $DN_THIS/recreate-cassandra-table.sh
 echo
-sleep 1
+sleep 0.1
 
 time -p $DN_THIS/load.sh
 echo
@@ -34,13 +34,11 @@ sleep 0.1
 #     the same. but, in 230 secs, the bottleneck becomes the disk io.
 
 echo "Running the YCSB workload ..."
-time -p bin/ycsb run cassandra-cql \
--P workloads/workloadd \
--s \
--p hosts=`cat ~/work/mutants/.run/cassandra-server-ips` \
--p recordcount=1000 \
--p operationcount=50000000 \
--p status.interval=1 \
--p fieldcount=10 \
--p fieldlength=2000 \
--threads 100
+cmd = "time -p bin/ycsb run cassandra-cql" \
+" -P workloads/workloadd" \
+" -s" \
+" -p hosts=`cat ~/work/mutants/.run/cassandra-server-ips`" \
+" " \
+$1
+
+eval $cmd
