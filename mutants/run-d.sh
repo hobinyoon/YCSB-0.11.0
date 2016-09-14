@@ -3,6 +3,8 @@
 set -e
 set -u
 
+# TODO: restart dstat and store log to a file. may want to rewrite this in python.
+
 DN_THIS=`dirname $BASH_SOURCE`
 
 pushd $DN_THIS/.. >/dev/null
