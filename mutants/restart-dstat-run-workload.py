@@ -38,9 +38,9 @@ def main(argv):
 					, GetEc2Tags()["name"].replace("server", "s").replace("client", "c"))
 	Util.MkDirs(dn_ycsb_log)
 
-	fn_log = "%s/%s-%s" % (dn, _cur_datetime, workload_type)
+	fn_log = "%s/%s-%s" % (dn_ycsb_log, _cur_datetime, workload_type)
 
-	cmd = "%s/_run-%s.sh \"%s\" 2>&1 | tee -a %s | grep --color=always -E \"^|Mutants\"" \
+	cmd = "%s/_run-%s.py %s 2>&1 | tee -a %s | grep --color=always -E \"^|Mutants\"" \
 			% (os.path.dirname(__file__), workload_type, ycsb_params, fn_log)
 	Util.RunSubp(cmd)
 	Cons.P("Created %s %d" % (fn_log, os.path.getsize(fn_log)))

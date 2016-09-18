@@ -1,3 +1,9 @@
+#!/bin/bash
+
+set -e
+set -u
+set -x
+
 DN_THIS=`dirname $BASH_SOURCE`
 
 echo "(Re)creating the cassandra YCSB table ..."
