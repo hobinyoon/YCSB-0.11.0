@@ -17,9 +17,9 @@ import BotoClient
 _cur_datetime = datetime.datetime.now().strftime("%y%m%d-%H%M%S")
 
 def main(argv):
-	if len(argv) == 3:
+	if len(argv) >= 3:
 		workload_type = argv[1]
-		ycsb_params = argv[2]
+		ycsb_params = " ".join(argv[i] for i in range(2, len(argv)))
 	else:
 		workload_type = "d"
 		ycsb_params = "-p recordcount=1000" \
