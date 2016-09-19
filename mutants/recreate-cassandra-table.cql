@@ -20,4 +20,6 @@ create table usertable (
 		field6 varchar,
 		field7 varchar,
 		field8 varchar,
-		field9 varchar);
+		field9 varchar)
+with compaction =
+    { 'class' : 'LeveledCompactionStrategy' };
