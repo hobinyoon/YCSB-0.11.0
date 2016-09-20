@@ -23,11 +23,12 @@ def main(argv):
 	else:
 		workload_type = "d"
 		ycsb_params = "-p recordcount=1000" \
-				" -p operationcount=50000000" \
+				" -p operationcount=10000" \
 				" -p status.interval=1" \
 				" -p fieldcount=10" \
 				" -p fieldlength=2000" \
 				" -threads 100"
+				#" -p operationcount=50000000" \
 
 	RestartDstat()
 
