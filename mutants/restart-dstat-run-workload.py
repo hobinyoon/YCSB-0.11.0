@@ -23,12 +23,18 @@ def main(argv):
 	else:
 		workload_type = "d"
 		ycsb_params = "-p recordcount=1000" \
-				" -p operationcount=10000" \
+				" -p operationcount=10000000" \
 				" -p status.interval=1" \
 				" -p fieldcount=10" \
-				" -p fieldlength=2000" \
+				" -p fieldlength=100" \
 				" -threads 100"
 				#" -p operationcount=50000000" \
+				#" -threads 100"
+
+				# 16 GB. Makes sense. Raw data is about 10 GB.
+				#" -p operationcount=10,000,000" \
+				#" -p fieldcount=10" \
+				#" -p fieldlength=100" \
 
 	RestartDstat()
 

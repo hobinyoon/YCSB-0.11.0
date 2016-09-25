@@ -22,4 +22,10 @@ create table usertable (
 		field8 varchar,
 		field9 varchar)
 with compaction =
-    { 'class' : 'LeveledCompactionStrategy' };
+    { 'class' : 'LeveledCompactionStrategy'
+		, 'log_all' : true
+		, 'sstable_size_in_mb' : 20
+		};
+
+-- SSTable size to 20 MB just for checking how SSTables are compacted.
+-- - https://docs.datastax.com/en/cql/3.1/cql/cql_reference/compactSubprop.html

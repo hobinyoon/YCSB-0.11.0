@@ -34,9 +34,6 @@ Mutants definitely need a max SSTable size cap.
 
 
 
-- For LCS, capping SSTable size is equivalent to capping the max level.
-	[http://www.datastax.com/dev/blog/leveled-compaction-in-apache-cassandra]
-
 LCS vs STCS
 - "LCS does roughly twice as much i/o as STCS. For primarily insert-oriented
 	workloads, this extra i/o does not pay off in terms of the above benefits,
@@ -52,7 +49,8 @@ LCS vs STCS
 		by default in Cassandra’s implementation), that are grouped into “levels.”
 		Within each level, sstables are guaranteed to be non-overlapping. Each
 		level is ten times as large as the previous."
-		- TODO: Double check the 5MB with an experiment.
+		[http://www.datastax.com/dev/blog/leveled-compaction-in-apache-cassandra]
+		- It is 160 MB.
 	- The default size is 160 MB. sstable_size_in_mb
 		[https://docs.datastax.com/en/cql/3.3/cql/cql_reference/compactSubprop.html]
 	- LCS is a good fit for workload "d" for high read:write ratio. But, I think
