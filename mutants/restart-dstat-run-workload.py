@@ -30,13 +30,36 @@ def main(argv):
 				" -p fieldlength=100"
 
 		# 20 M, 1KB, 50% write requests = 10 GB
-		ycsb_params += " -p operationcount=20000000"
+		# 400 M, 1KB, 5% write requests = 20 GB
+		# TODO: It will take a long time. May want to keep a snapshot of the data
+		# and the commit log directories for later.
+		ycsb_params += " -p operationcount=400000000"
 
 		# Generate SSTables a bit faster. The default was 95% read.
-		ycsb_params += " -p readproportion=0.50 -p insertproportion=0.50"
+		#ycsb_params += " -p readproportion=0.50 -p insertproportion=0.50"
+		#
+		# 30% writes to reduce the pending compactions. With a 50% write, network
+		# BW was less than 15 MB/sec. Still pending compactions. Max network
+		# bandwidth recv/send: 26 MB/13 MB
+		#
+		# With 20% write, up to 4 after 500 secs. Max network bandwidth 38 / 20 MB
+		# But, the number goes down.
+		#ycsb_params += " -p readproportion=0.80 -p insertproportion=0.20"
+		#
+		# 15% writes. Unthrottling is still not very realistic. The average server
+		# load at Google is less than 30%. Max network 43 / 10. Up to 3.
+		# I don't see any intra-L0 compactions.
+		#ycsb_params += " -p readproportion=0.85 -p insertproportion=0.15"
+
+		ycsb_params += " -p readproportion=0.95 -p insertproportion=0.05"
 
 		# Throttle
-		#ycsb_params += " -target 15000"
+		# With 10K, server CPU load less than 20%. It spikes to 40% when
+		# compacting.
+		# With 12K, about the same.
+		# 20K. About 40%
+		# 17K. About 31 - 32%. Good.
+		ycsb_params += " -target 17000"
 
 		#" -p operationcount=50000000" \
 		#" -threads 100"
