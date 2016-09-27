@@ -16,9 +16,6 @@ def main(argv):
 	Util.RunSubp("%s/load.sh" % os.path.dirname(__file__))
 	time.sleep(0.1)
 
-	# Throttle op/s
-	#   -target 100 \
-
 	# Without limiting memory, p fieldcount=10 fieldlength=100 -threads 100, server CPU is the
 	# bottleneck. Network around 52 MB/s.
 

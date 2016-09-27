@@ -22,19 +22,34 @@ def main(argv):
 		ycsb_params = " ".join(argv[i] for i in range(2, len(argv)))
 	else:
 		workload_type = "d"
-		ycsb_params = "-p recordcount=1000" \
-				" -p operationcount=10000000" \
+		ycsb_params = \
+				" -threads 100" \
+				" -p recordcount=1000" \
 				" -p status.interval=1" \
 				" -p fieldcount=10" \
-				" -p fieldlength=100" \
-				" -threads 100"
-				#" -p operationcount=50000000" \
-				#" -threads 100"
+				" -p fieldlength=100"
 
-				# 16 GB. Makes sense. Raw data is about 10 GB.
-				#" -p operationcount=10,000,000" \
-				#" -p fieldcount=10" \
-				#" -p fieldlength=100" \
+		# 20 M, 1KB, 50% write requests = 10 GB
+		ycsb_params += " -p operationcount=20000000"
+
+		# Generate SSTables a bit faster. The default was 95% read.
+		ycsb_params += " -p readproportion=0.50 -p insertproportion=0.50"
+
+		# Throttle
+		#ycsb_params += " -target 15000"
+
+		#" -p operationcount=50000000" \
+		#" -threads 100"
+
+		# Can you skip the loading phase? Probably by starting from 0 record?
+		# Not progressing. A CPU seems to be stalled. Let's not do this. With 1
+		# record loaded, it shows the READ-FAILED stat.
+		#"-p recordcount=0" \
+
+		# 16 GB. Makes sense. Raw data is about 10 GB.
+		#" -p operationcount=10,000,000" \
+		#" -p fieldcount=10" \
+		#" -p fieldlength=100" \
 
 	RestartDstat()
 
