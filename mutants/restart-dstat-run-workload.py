@@ -58,7 +58,17 @@ def main(argv):
 		# compacting.
 		# With 12K, about the same.
 		# 20K. About 40%
-		# 17K. About 31 - 32%. Good.
+		# 17K.
+		#   About 31 - 32%. Good. 37% at 1000 secs. 50% at 2000 secs. 50 - 60% at
+		#   8000 secs.
+		#   Took 33974804 ms = 9 h 26 m
+		#   Data and commit log directory sizes:
+		#     13596    /home/ubuntu/work/mutants/cassandra/data/commitlog
+		#     4        /home/ubuntu/work/mutants/cassandra/data/hints
+		#     58596    /home/ubuntu/work/mutants/cassandra/data/saved_caches
+		#     21240284 /mnt/local-ssd1/cassandra-data
+		#   Number of SSTables in /mnt/local-ssd1/cassandra-data/ycsb/usertable-488da08084bf11e6ad9963c053f92bbd:
+		#     146
 		ycsb_params += " -target 17000"
 
 		#" -p operationcount=50000000" \
