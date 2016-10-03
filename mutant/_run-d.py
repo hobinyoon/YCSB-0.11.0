@@ -4,7 +4,7 @@ import os
 import sys
 import time
 
-sys.path.insert(0, "%s/work/mutants/ec2-tools/lib/util" % os.path.expanduser("~"))
+sys.path.insert(0, "%s/work/mutant/ec2-tools/lib/util" % os.path.expanduser("~"))
 import Cons
 import Util
 
@@ -37,7 +37,7 @@ def main(argv):
 			" && bin/ycsb run cassandra-cql" \
 			" -P workloads/workloadd" \
 			" -s" \
-			" -p hosts=`cat ~/work/mutants/.run/cassandra-server-ips`" \
+			" -p hosts=`cat ~/work/mutant/.run/cassandra-server-ips`" \
 			" %s" \
 			% (os.path.dirname(__file__)
 					, " ".join(argv[i] for i in range(1, len(argv))))

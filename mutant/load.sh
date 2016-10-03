@@ -13,7 +13,7 @@ bin/ycsb load cassandra-cql \
 -P workloads/workloada \
 -s \
 -threads 10 \
--p hosts=`cat ~/work/mutants/.run/cassandra-server-ips` \
+-p hosts=`cat ~/work/mutant/.run/cassandra-server-ips` \
 -p recordcount=1000
 
 popd >/dev/null

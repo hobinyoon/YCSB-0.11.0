@@ -5,12 +5,12 @@ import os
 import re
 import sys
 
-sys.path.insert(0, "%s/work/mutants/ec2-tools/lib/util" % os.path.expanduser("~"))
+sys.path.insert(0, "%s/work/mutant/ec2-tools/lib/util" % os.path.expanduser("~"))
 import Cons
 import Util
 
 _dn_stat = "%s/.stat" % os.path.dirname(__file__)
-_dn_ycsb_log = "%s/work/mutants/log/ycsb" % os.path.expanduser("~")
+_dn_ycsb_log = "%s/work/mutant/log/ycsb" % os.path.expanduser("~")
 _log_id = "160912-234955-d"
 #_log_id = "160913-171610-d"
 _fn_stat = None

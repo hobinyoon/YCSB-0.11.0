@@ -1,4 +1,4 @@
--- cqlsh -f create-cassandra-table.cql `cat ~/work/mutants/.run/cassandra-server-ips`
+-- cqlsh -f create-cassandra-table.cql `cat ~/work/mutant/.run/cassandra-server-ips`
 
 -- https://github.com/brianfrankcooper/YCSB/tree/master/cassandra
 

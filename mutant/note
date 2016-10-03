@@ -1,3 +1,5 @@
+TODO: Merge this to the misc note
+
 TODO: What compaction strategies do others use? MongoDB and HBase.
 
 TODO: The default bloom_filter_fp_chance for LeveledCompactionStrategy is 0.1,
@@ -17,20 +19,20 @@ TODO: What is this?
 	practice to configure the max_threshold subproperty for a table to use when
 	the switch occurs."
 
-Mutants definitely need a max SSTable size cap.
+Mutant needs a max SSTable size cap.
 - Why do you want to cap it?
 	- To be able to make a fine-grained SSTable allocation to different storages.
 	- The problem can get worse for the migration from S_n to S_(n+1), when n >=
 		1.
 - Can you cap the SSTable size in STCS? I don't see the option. Probably
-	not since the bigger a SSTable is, the better read performance you get.
+	not, since the bigger a SSTable is, the better read performance you get.
 	- "Of course, if you stop updating the row, then size-tiered compaction will
 		eventually merge the row fragments into a single SSTable."
 		[http://www.datastax.com/dev/blog/when-to-use-leveled-compaction]
-	- TODO: Then, can you compensate this with a lower BF FP ratio? Probably yes,
+	- Then, can you compensate this with a lower BF FP ratio? Probably yes,
 		for workload type d, or read-heavy ones. Probably no, for update heavy one.
 		Explore the tradeoff here.
-- TODO: How do you evaluate this?
+- LCS is a natural fit.
 
 
 

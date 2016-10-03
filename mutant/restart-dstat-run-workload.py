@@ -6,11 +6,11 @@ import re
 import subprocess
 import sys
 
-sys.path.insert(0, "%s/work/mutants/ec2-tools/lib/util" % os.path.expanduser("~"))
+sys.path.insert(0, "%s/work/mutant/ec2-tools/lib/util" % os.path.expanduser("~"))
 import Cons
 import Util
 
-sys.path.insert(0, "%s/work/mutants/ec2-tools/lib" % os.path.expanduser("~"))
+sys.path.insert(0, "%s/work/mutant/ec2-tools/lib" % os.path.expanduser("~"))
 import BotoClient
 
 
@@ -63,9 +63,9 @@ def main(argv):
 		#   8000 secs.
 		#   Took 33974804 ms = 9 h 26 m
 		#   Data and commit log directory sizes:
-		#     13596    /home/ubuntu/work/mutants/cassandra/data/commitlog
-		#     4        /home/ubuntu/work/mutants/cassandra/data/hints
-		#     58596    /home/ubuntu/work/mutants/cassandra/data/saved_caches
+		#     13596    /home/ubuntu/work/mutant/cassandra/data/commitlog
+		#     4        /home/ubuntu/work/mutant/cassandra/data/hints
+		#     58596    /home/ubuntu/work/mutant/cassandra/data/saved_caches
 		#     21240284 /mnt/local-ssd1/cassandra-data
 		#   Number of SSTables in /mnt/local-ssd1/cassandra-data/ycsb/usertable-488da08084bf11e6ad9963c053f92bbd:
 		#     146
@@ -87,7 +87,7 @@ def main(argv):
 	RestartDstat()
 
 	# Start workload
-	dn_ycsb_log = "%s/work/mutants/log/%s/%s/ycsb" \
+	dn_ycsb_log = "%s/work/mutant/log/%s/%s/ycsb" \
 			% (os.path.expanduser("~")
 					, GetEc2Tags()["job_id"]
 					, GetEc2Tags()["name"].replace("server", "s").replace("client", "c"))
@@ -95,7 +95,7 @@ def main(argv):
 
 	fn_log = "%s/%s-%s" % (dn_ycsb_log, _cur_datetime, workload_type)
 
-	cmd = "%s/_run-%s.py %s 2>&1 | tee -a %s | grep --color=always -E \"^|Mutants\"" \
+	cmd = "%s/_run-%s.py %s 2>&1 | tee -a %s | grep --color=always -E \"^|Mutant\"" \
 			% (os.path.dirname(__file__), workload_type, ycsb_params, fn_log)
 	Util.RunSubp(cmd)
 	Cons.P("Created %s %d" % (fn_log, os.path.getsize(fn_log)))
@@ -182,7 +182,7 @@ def RestartDstat():
 					time.sleep(0.1)
 
 		# Run dstat as a daemon
-		dn = "%s/work/mutants/log/%s/%s/dstat" \
+		dn = "%s/work/mutant/log/%s/%s/dstat" \
 				% (os.path.expanduser("~")
 						, GetEc2Tags()["job_id"]
 						, GetEc2Tags()["name"].replace("server", "s").replace("client", "c"))
