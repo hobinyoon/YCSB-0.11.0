@@ -17,7 +17,7 @@ def main(argv):
 	time.sleep(0.1)
 
 	Cons.P("Running the YCSB workload ...")
-	cmd = "cd %s/.." \
+	cmd = "cd %s/../.." \
 			" && bin/ycsb run cassandra-cql" \
 			" -P workloads/workloade" \
 			" -s" \

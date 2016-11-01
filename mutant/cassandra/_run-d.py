@@ -33,7 +33,7 @@ def main(argv):
 	#     the same. but, in 230 secs, the bottleneck becomes the disk io.
 
 	Cons.P("Running the YCSB workload ...")
-	cmd = "cd %s/.." \
+	cmd = "cd %s/../.." \
 			" && bin/ycsb run cassandra-cql" \
 			" -P workloads/workloadd" \
 			" -s" \
