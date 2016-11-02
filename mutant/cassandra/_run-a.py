@@ -21,6 +21,8 @@ def main(argv):
 
 		# The server can handle >6000 IOPS when unthrottled
 		# With 4000, server CPU load < 20%
+		#
+		# CPU up to 47%, when running multiple compactions.
 		ycsb_params += " -target 4000"
 
 		ycsb_params += " -p recordcount=20000000"
@@ -28,7 +30,9 @@ def main(argv):
 		# 100000 : 27736.0 ms = ? : 1 h
 		#ycsb_params += " -p operationcount=100000"
 		# 12979521 operations to run for 1 hour.
-		ycsb_params += " -p operationcount=12979521"
+		#ycsb_params += " -p operationcount=12979521"
+		# For 10 hours
+		ycsb_params += " -p operationcount=129795210"
 
 		ycsb_params += " -p status.interval=1"
 		ycsb_params += " -p fieldcount=10"
