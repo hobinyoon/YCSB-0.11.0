@@ -21,7 +21,7 @@ def main(argv):
 		workload_type = argv[1]
 		ycsb_params = " ".join(argv[i] for i in range(2, len(argv)))
 	else:
-		workload_type = "d"
+		workload_type = "a"
 		ycsb_params = \
 				" -threads 100" \
 				" -p recordcount=1000" \

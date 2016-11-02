@@ -18,9 +18,18 @@ def main(argv):
 		# -p recordcount=1000 -p operationcount=1 -p status.interval=1 -p fieldcount=10 -p fieldlength=100
 	else:
 		ycsb_params += " -threads 100"
-		ycsb_params += " -target 1700"
+
+		# The server can handle >6000 IOPS when unthrottled
+		# With 4000, server CPU load < 20%
+		ycsb_params += " -target 4000"
+
 		ycsb_params += " -p recordcount=20000000"
-		ycsb_params += " -p operationcount=10000"
+
+		# 100000 : 27736.0 ms = ? : 1 h
+		#ycsb_params += " -p operationcount=100000"
+		# 12979521 operations to run for 1 hour.
+		ycsb_params += " -p operationcount=12979521"
+
 		ycsb_params += " -p status.interval=1"
 		ycsb_params += " -p fieldcount=10"
 		ycsb_params += " -p fieldlength=100"
