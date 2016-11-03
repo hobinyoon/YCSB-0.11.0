@@ -17,23 +17,22 @@ import BotoClient
 _cur_datetime = datetime.datetime.now().strftime("%y%m%d-%H%M%S")
 
 def main(argv):
-	if len(argv) >= 3:
-		workload_type = argv[1]
-		ycsb_params = " ".join(argv[i] for i in range(2, len(argv)))
-	else:
-		workload_type = "a"
-
 	RestartDstat()
+	RunYcsb(argv)
 
-	RunYcsb()
 
-
-def RunYcsb():
+def RunYcsb(argv):
 	dn_ycsb_log = "%s/work/mutant/log/%s/%s/ycsb" \
 			% (os.path.expanduser("~")
 					, GetEc2Tags()["job_id"]
 					, GetEc2Tags()["name"].replace("server", "s").replace("client", "c"))
 	Util.MkDirs(dn_ycsb_log)
+
+	if len(argv) >= 3:
+		workload_type = argv[1]
+		ycsb_params = " ".join(argv[i] for i in range(2, len(argv)))
+	else:
+		workload_type = "a"
 
 	fn_log = "%s/%s-%s" % (dn_ycsb_log, _cur_datetime, workload_type)
 
