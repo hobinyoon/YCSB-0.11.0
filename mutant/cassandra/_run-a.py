@@ -13,7 +13,7 @@ def main(argv):
 	# No recreation of the keyspace. Use the pre-populated one.
 
 	ycsb_params = ""
-	if False:
+	if True:
 		ycsb_params = " ".join(argv[i] for i in range(1, len(argv)))
 		# -p recordcount=1000 -p operationcount=1 -p status.interval=1 -p fieldcount=10 -p fieldlength=100
 	else:
