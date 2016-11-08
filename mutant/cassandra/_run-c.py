@@ -34,11 +34,11 @@ def main(argv):
 
 	Cons.P("Running the YCSB workload ...")
 	cmd = "cd %s/../.." \
-			" && bin/ycsb run basic" \
+			" && bin/ycsb run cassandra-cql" \
 			" -P workloads/workloadc" \
 			" -s" \
 			% os.path.dirname(__file__)
-			#" && bin/ycsb run cassandra-cql" \
+			#" && bin/ycsb run basic" \
 	
 	# basic
 	# "The YCSB Client is distributed with a simple dummy interface layer,
